@@ -2388,6 +2388,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+    def __init__(self):
         self.players = []
         self.max_players = 0
         self.active = False
