@@ -2124,6 +2124,86 @@ async def clear(ctx):
     await ctx.send(f"✅ Cleared {deleted_count} tournament messages (kept leaderboards).", delete_after=5)
     await log_command(ctx.guild.id, ctx.author, "!clear", f"Deleted {deleted_count} tournament messages")
 
+    # Check for number guessing game
+    guild_str = str(message.guild.id)
+    if guild_str in active_games and message.channel.id == active_games[guild_str]['channel_id']:
+        try:
+            guessed_number = int(message.content.strip())
+            correct_number = active_games[guild_str]['number']
+            
+            if guessed_number == correct_number:
+                embed = discord.Embed(
+                    title="🎉 Congratulations!",
+                    description=f"{message.author.mention} guessed the correct number: **{correct_number}**!",
+                    color=0x00ff00
+                )
+                await message.channel.send(embed=embed)
+                
+                # Award SP for winning
+                add_sp(message.guild.id, message.author.id, 1)
+                
+                # Remove the active game
+                del active_games[guild_str]
+        except ValueError:
+            pass  # Not a number, ignore
+    
+    await bot.process_commands(message)
+
+# Error handling
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MemberNotFound):
+        await ctx.send("User not found.")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f"Missing required argument: {error.param}")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("Invalid argument provided.")
+    else:
+        print(f"Unhandled error: {error}")
+
+# Additional utility commands
+@bot.command()
+async def game(ctx, game_range: str):
+    """Start a number guessing game"""
+    if not await is_staff(ctx):
+        await ctx.send("You don't have permission to use this command.")
+        return
+    
+    # Parse the range (e.g., "1-50")
+    try:
+        if '-' in game_range:
+            min_num, max_num = map(int, game_range.split('-'))
+        else:
+            await ctx.send("❌ Please use the format: !game 1-50")
+            return
+        
+        if min_num >= max_num or min_num < 1 or max_num > 10000:
+            await ctx.send("❌ Invalid range. Use a valid range like 1-50")
+            return
+        
+    except ValueError:
+        await ctx.send("❌ Please use the format: !game 1-50")
+        return
+    
+    # Select random number
+    selected_number = random.randint(min_num, max_num)
+    
+    guild_str = str(ctx.guild.id)
+    active_games[guild_str] = {
+        'number': selected_number,
+        'range': [min_num, max_num],
+        'channel_id': ctx.channel.id
+    }
+    
+    embed = discord.Embed(
+        title="🎲 Number Guessing Game Started!",
+        description=f"I've selected a number between **{min_num}** and **{max_num}**!\n\nGuess the number by typing it in chat!",
+        color=0xff9500
+    )
+    embed.set_footer(text=f"Range: {min_num} - {max_num}")
+    
+    await ctx.send(embed=embed)
+    
 # Run the bot
 if __name__ == "__main__":
     if not TOKEN:
