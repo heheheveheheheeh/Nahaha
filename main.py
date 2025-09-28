@@ -6,11 +6,11 @@ import asyncio
 import json
 import re
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
+from keep_alive import keep_alive
 
 # Load environment variables
-load_dotenv()
 
+keep_alive()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
