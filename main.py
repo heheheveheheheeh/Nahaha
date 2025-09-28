@@ -11,7 +11,7 @@ from keep_alive import keep_alive
 # Load environment variables
 
 keep_alive()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
