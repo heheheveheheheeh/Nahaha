@@ -3181,7 +3181,7 @@ async def update(ctx):
 if __name__ == "__main__":
     if not TOKEN:
         print("❌ No Discord token found! Please add your bot token to the environment variables.")
-        print("Please set DISCORD_TOKEN environment variable with your bot token")
+        print("Please set TOKEN environment variable with your bot token")
     else:
         try:
             bot.run(TOKEN)
