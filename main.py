@@ -8,6 +8,7 @@ import re
 from keep_alive import keep_alive
 
 # Load environment variables
+
 keep_alive()
 TOKEN = os.getenv("TOKEN")
 
