@@ -6,6 +6,7 @@ import asyncio
 import json
 import re
 from datetime import datetime, timedelta
+from keep_alive import keep_alive
 
 # Load environment variables
 
